@@ -2,10 +2,14 @@ import { View, Text, TextInput } from "react-native";
 import { commonStyles } from "@/styles/common.style";
 import { windowHeight, windowWidth } from "@/themes/app.constant";
 import { external } from "@/styles/external.style";
-import styles from "@/screens/login/styles";
 import color from "@/themes/app.colors";
+import styles from "@/screens/login/styles";
+import SelectInput from "../common/select-input";
+import { useState } from "react";
+import { countryItems } from "@/configs/country-list";
 
 export default function PhoneNumberInput({ width }: any) {
+  const [countryCode, setCountryCode] = useState("92");
   return (
     <View>
       <Text
@@ -29,11 +33,14 @@ export default function PhoneNumberInput({ width }: any) {
             },
           ]}
         >
-          <TextInput
-            style={[commonStyles.regularText]}
-            placeholderTextColor={color.subtitle}
-            placeholder="+880"
-            keyboardType="numeric"
+          <SelectInput
+            title="+92"
+            placeholder="Select country code"
+            value={countryCode}
+            onValueChange={(value) => setCountryCode(value)}
+            showWarning={false}
+            warning={"Please select a valid country code"}
+            items={countryItems}
           />
         </View>
         <View
