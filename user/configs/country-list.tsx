@@ -1,4 +1,5 @@
 export const countryItems = [
+  { label: "+92", value: "92" },
   { label: "+93", value: "93" },
   { label: "+355", value: "355" },
   { label: "+213", value: "213" },
@@ -126,7 +127,6 @@ export const countryItems = [
   { label: "+389", value: "389" },
   { label: "+47", value: "47" },
   { label: "+968", value: "968" },
-  { label: "+92", value: "92" },
   { label: "+680", value: "680" },
   { label: "+970", value: "970" },
   { label: "+507", value: "507" },

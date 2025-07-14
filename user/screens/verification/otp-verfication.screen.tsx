@@ -8,9 +8,53 @@ import { style } from "./style";
 import color from "@/themes/app.colors";
 import { external } from "@/styles/external.style";
 import Button from "@/components/common/button";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { commonStyles } from "@/styles/common.style";
+import { useToast } from "react-native-toast-notifications";
+import axios from "axios";
 const OtpVerficationScreen = () => {
+  const [otp, setOtp] = React.useState("");
+  const [loader, setLoader] = React.useState(false);
+  const toast = useToast();
+  const { phoneNumber } = useLocalSearchParams();
+  const handleSubmit = async () => {
+    if (otp === "") {
+      toast.show("please fill the fields!", {
+        placement: "bottom",
+      });
+    } else {
+      setLoader(true);
+      const otpNumber = `${otp}`;
+      console.log(otpNumber, phoneNumber);
+      await axios
+        .post(`http://10.0.2.2:8000/api/v1/verify-otp`, {
+          phone_number: phoneNumber,
+          otp: otpNumber,
+        })
+        .then((res) => {
+          setLoader(false);
+          console.log(res.data);
+          if (res.data.user.email === null) {
+            router.push({
+              pathname: "/(routes)/registration",
+              params: {
+                user: JSON.stringify(res.data.user),
+              },
+            });
+            toast.show("Account Verified!");
+          }else{
+            router.push("/(tabs)/home");
+          }
+        })
+        .catch((error) => {
+          setLoader(false);
+          toast.show("Something went wrong! Please re-check your OTP!.", {
+            type: "danger",
+            placement: "bottom",
+          });
+        });
+    }
+  };
   return (
     <AuthContainer
       topSpace={windowHeight(240)}
@@ -22,7 +66,7 @@ const OtpVerficationScreen = () => {
             subtitle={"Check you phone number for the otp!"}
           />
           <OTPTextInput
-            handleTextChange={(text) => console.log(text)}
+            handleTextChange={(text) => setOtp(text)}
             inputCount={4}
             textInputStyle={style.otpTextInput}
             tintColor={color.subtitle}
@@ -31,7 +75,8 @@ const OtpVerficationScreen = () => {
           <View style={[external.mt_30]}>
             <Button
               title={"Verify"}
-              onPress={() => router.push("/(tabs)/home")}
+              onPress={() => handleSubmit()}
+              disabled={loader}
             />
           </View>
           <View style={[external.mb_15]}>
@@ -45,7 +90,7 @@ const OtpVerficationScreen = () => {
               <Text style={commonStyles.regularText}>Not Received yet?</Text>
               <TouchableOpacity>
                 <Text style={[style.signUpText, { color: "#000" }]}>
-                    Resend it
+                  Resend it
                 </Text>
               </TouchableOpacity>
             </View>

@@ -9,15 +9,15 @@ datasource db {
 }
 
 model User {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String?
-  phone_number Float    @unique
-  email       String?   @unique
-  ratings     Float     @default(0)
-  totalRides  Float     @default(0)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  rides       rides[]   @relation("UserRides")  // ✅ Added this
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?
+  phone_number  String   @unique                // FIXED: changed to String
+  email         String?  @unique
+  ratings       Float     @default(0)
+  totalRides    Int       @default(0)            // FIXED: changed to Int
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  rides         rides[]   @relation("UserRides")
 }
 
 enum VehicleType {
@@ -30,7 +30,7 @@ model driver {
   id                  String      @id @default(auto()) @map("_id") @db.ObjectId
   name                String
   country             String
-  phone_number        String      @unique
+  phone_number        String      @unique               // FIXED: changed to String
   email               String      @unique
   vehicle_type        VehicleType
   registration_number String      @unique
@@ -41,9 +41,9 @@ model driver {
   notificationToken   String?
   ratings             Float       @default(0)
   totalEarning        Float       @default(0)
-  totalRides          Float       @default(0)
-  pendingRides        Float       @default(0)
-  cancelRides         Float       @default(0)
+  totalRides          Int         @default(0)           // FIXED: changed to Int
+  pendingRides        Int         @default(0)           // FIXED: changed to Int
+  cancelRides         Int         @default(0)           // FIXED: changed to Int
   status              String      @default("inactive")
   createdAt           DateTime    @default(now())
   updatedAt           DateTime    @updatedAt
