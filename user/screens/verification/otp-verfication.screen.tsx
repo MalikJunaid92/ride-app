@@ -12,6 +12,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { commonStyles } from "@/styles/common.style";
 import { useToast } from "react-native-toast-notifications";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const OtpVerficationScreen = () => {
   const [otp, setOtp] = React.useState("");
   const [loader, setLoader] = React.useState(false);
@@ -31,7 +32,7 @@ const OtpVerficationScreen = () => {
           phone_number: phoneNumber,
           otp: otpNumber,
         })
-        .then((res) => {
+        .then(async (res) => {
           setLoader(false);
           console.log(res.data);
           if (res.data.user.email === null) {
@@ -42,7 +43,8 @@ const OtpVerficationScreen = () => {
               },
             });
             toast.show("Account Verified!");
-          }else{
+          } else {
+            await AsyncStorage.setItem("accessToken", res.data.accessToken);
             router.push("/(tabs)/home");
           }
         })

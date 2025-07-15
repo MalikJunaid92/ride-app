@@ -1,11 +1,10 @@
 import { View, Text } from 'react-native'
 import React from 'react'
+import EmailVerficationScreen from '@/screens/email-verification/email-verification.screen'
 
 const index = () => {
   return (
-    <View>
-      <Text>index</Text>
-    </View>
+    <EmailVerficationScreen/>
   )
 }
 

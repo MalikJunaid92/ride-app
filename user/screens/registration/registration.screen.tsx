@@ -6,12 +6,12 @@ import Button from "@/components/common/button";
 import TitleView from "@/components/signup/title.view";
 import Input from "@/components/common/input";
 import color from "@/themes/app.colors";
-import axios from "axios";
 import { router, useLocalSearchParams } from "expo-router";
-import { Toast } from "react-native-toast-notifications";
+import axios from "axios";
 const RegistrationScreen = () => {
   const { colors } = useTheme();
   const { user } = useLocalSearchParams() as any;
+  const parsedUser = JSON.parse(user);
   const [emailFormatWarning, setEmailFormatWarning] = useState("");
   const [showWarning, setShowWarning] = useState(false);
   const [formData, setFormData] = useState({
@@ -19,6 +19,7 @@ const RegistrationScreen = () => {
     phoneNumber: "",
     email: "",
   });
+  const [loading, setLoading] = useState(false);
   const handleChange = (key: string, value: string) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -26,16 +27,31 @@ const RegistrationScreen = () => {
     }));
   };
   const handleSubmit = async () => {
-    const userData: any = {
-      id: user.id,
-      name: formData.name,
-      email: formData.email,
-      phone_number: user.phone_number,
-    };
-    router.push({
-      pathname: "/(routes)/email-verification",
-      params: { user: userData },
-    });
+    setLoading(true);
+    await axios
+      .post(`http://10.0.2.2:8000/api/v1/email-otp-request`, {
+        email: formData.email,
+        name: formData.name,
+        userId: parsedUser.id,
+      })
+      .then(async (res: any) => {
+        setLoading(false);
+        const userData: any = {
+          id: parsedUser.id,
+          name: formData.name,
+          email: formData.email,
+          phone_number: parsedUser.phone_number,
+          token: res.data.token,
+        };
+        router.push({
+          pathname: "/(routes)/email-verification",
+          params: { user: JSON.stringify(userData) },
+        });
+      })
+      .catch((error) => {
+        setLoading(false);
+        console.log(error);
+      });
   };
   return (
     <ScrollView>
@@ -70,7 +86,7 @@ const RegistrationScreen = () => {
               <Input
                 title="Phone Number"
                 placeholder="Enter your phone number"
-                value={user.phone_number}
+                value={parsedUser?.phone_number}
                 disabled={true}
               />
               <Input
@@ -92,9 +108,9 @@ const RegistrationScreen = () => {
               />
               <View style={styles.margin}>
                 <Button
-                    onPress={() => handleSubmit()}
+                  onPress={() => handleSubmit()}
                   title="Next"
-                    // disabled={loading}
+                  disabled={loading}
                   backgroundColor={color.buttonBg}
                   textColor={color.whiteColor}
                 />
